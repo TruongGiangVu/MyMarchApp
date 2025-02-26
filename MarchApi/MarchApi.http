@@ -1,0 +1,6 @@
+@MarchApi_HostAddress = http://localhost:5194
+
+GET {{MarchApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
