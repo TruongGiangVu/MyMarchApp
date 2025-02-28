@@ -2,29 +2,35 @@ using MarchApi.Dtos;
 using MarchApi.Enums;
 using MarchApi.Models;
 
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+
 namespace MarchApi.Repositories;
 
 public class ToDoItemRepository : IToDoItemRepository
 {
     private readonly Serilog.ILogger _log = Log.ForContext<ToDoItemRepository>();
-    private List<ToDoItem> data = [
-        new(id:1, name:"Học lập trình", description:"Mô tả Học lập trình", isDone: true, priority : PriorityEnum.Medium),
-        new(id:2, name:"Viết tài liệu", description:"Mô tả Viết tài liệu", isDone: false, priority : PriorityEnum.Low),
-    ];
-
+    private readonly MarchContext _context;
+    public ToDoItemRepository(MarchContext context)
+    {
+        _context = context;
+    }
     public List<ToDoItem>? GetAll(ToDoItemSearchDto search)
     {
-        List<ToDoItem>? res = data.Where(p =>
+        _log.Information($"{nameof(GetAll)} search:{search.ToJsonString()}");
+        
+        List<ToDoItem>? res = _context.ToDoItems.Where(p =>
             (string.IsNullOrWhiteSpace(search.Name) || p.Name.Contains(search.Name))
-            && (search.Priority is null || p.Priority == search.Priority)
+            && (search.Priority == null || p.Priority == search.Priority)
         ).ToList();
+
         _log.Information($"{nameof(GetAll)} return count: {res.Count}");
         return res;
     }
 
     public ToDoItem? GetById(long id)
     {
-        ToDoItem? res = data.Where(p => p.Id == id).FirstOrDefault();
+        ToDoItem? res = _context.ToDoItems.Where(p => p.Id == id).FirstOrDefault();
         _log.Information($"{nameof(GetById)} return: {res.ToJsonString()}");
         return res;
     }
@@ -33,7 +39,8 @@ public class ToDoItemRepository : IToDoItemRepository
     {
         _log.Information($"{nameof(Insert)} input: {entity.ToJsonString()}");
         DbReturn dbReturn = new();
-        data.Add(entity);
+        _context.ToDoItems.Add(entity);
+        _context.SaveChanges();
         dbReturn.SetProperties(ErrorCode.Success);
 
         _log.Information($"{nameof(Insert)} return: {dbReturn.ToJsonString()}");
@@ -45,10 +52,16 @@ public class ToDoItemRepository : IToDoItemRepository
         _log.Information($"{nameof(Update)} input: {entity.ToJsonString()}");
         DbReturn dbReturn = new();
 
-        int idx = data.FindIndex(p => p.Id == entity.Id);
-        if (idx >= 0)
+        bool isExist = IsExist(entity.Id);
+        if (isExist)
         {
-            data[idx] = entity;
+            EntityEntry<ToDoItem> entry = _context.Entry(entity);
+            if (entry.State == EntityState.Detached)
+            {
+                _context.ToDoItems.Attach(entity);
+            }
+            entry.State = EntityState.Modified;
+            _context.SaveChanges();
             dbReturn.SetProperties(ErrorCode.Success);
         }
         else
@@ -64,10 +77,15 @@ public class ToDoItemRepository : IToDoItemRepository
     {
         _log.Information($"{nameof(Delete)} id: {id}");
         DbReturn dbReturn = new();
-        int idx = data.FindIndex(p => p.Id == id);
-        if (idx >= 0)
+        ToDoItem? entity = FindById(id);
+        if (entity is not null)
         {
-            data.RemoveAt(idx);
+            if (_context.Entry(entity).State == EntityState.Detached)
+            {
+                _context.ToDoItems.Attach(entity);
+            }
+            _context.ToDoItems.Remove(entity);
+            _context.SaveChanges();
             dbReturn.SetProperties(ErrorCode.Success);
         }
         else
@@ -77,5 +95,16 @@ public class ToDoItemRepository : IToDoItemRepository
 
         _log.Information($"{nameof(Delete)} return: {dbReturn.ToJsonString()}");
         return dbReturn;
+    }
+
+    public bool IsExist(long id)
+    {
+        return _context.ToDoItems.Any(p => p.Id == id);
+    }
+
+    public ToDoItem? FindById(long id)
+    {
+        var entity = _context.ToDoItems.Where(p => p.Id == id).FirstOrDefault();
+        return entity;
     }
 }

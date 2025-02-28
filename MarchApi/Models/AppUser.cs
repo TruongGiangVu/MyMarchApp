@@ -9,7 +9,7 @@ public class AppUser
     public AppUser()
     {
     }
-    
+
     public AppUser(string userId, string userName, string role)
     {
         UserId = userId;
@@ -17,7 +17,7 @@ public class AppUser
         Role = role;
     }
 
-    public AppUser(OracleUser oracleUser)
+    public AppUser(DbUser oracleUser)
     {
         UserId = oracleUser.UserId;
         UserName = oracleUser.UserName;

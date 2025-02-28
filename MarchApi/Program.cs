@@ -8,6 +8,7 @@ using MarchApi.Settings;
 using MarchApi.Utilities;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -45,7 +46,7 @@ builder.Services.AddSwaggerGen(options =>
         string xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
         options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 
-        // hiển thị ổ khóa trên swagger
+        // hiển thị ổ khoá trên swagger
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             In = ParameterLocation.Header,
@@ -78,6 +79,11 @@ IConfigurationSection tokenSettingsConfig = builder.Configuration.GetSection(nam
 builder.Services.Configure<TokenSettings>(tokenSettingsConfig);
 TokenSettings? tokenSettings = tokenSettingsConfig.Get<TokenSettings>();
 
+// * map appsetting.json trường AppSettings với class AppSettings
+IConfigurationSection appSettingsConfig = builder.Configuration.GetSection(nameof(AppSettings));
+builder.Services.Configure<AppSettings>(appSettingsConfig);
+AppSettings? appSettings = appSettingsConfig.Get<AppSettings>();
+
 // * đăng ký service cho Authentication jwt bearer
 builder.Services.AddAuthentication(options =>
 {
@@ -99,6 +105,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 // * đăng ký repository
+builder.Services.AddDbContext<MarchContext>(o => o.UseSqlite(appSettings?.ConnectionString));
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IToDoItemRepository, ToDoItemRepository>();
 

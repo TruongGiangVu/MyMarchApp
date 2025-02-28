@@ -12,7 +12,7 @@ namespace MarchApi.Controllers;
 [Route("[controller]")]
 public class ToDoController : ControllerBase
 {
-    private readonly Serilog.ILogger _log = Log.ForContext<ToDoController>();
+    // private readonly Serilog.ILogger _log = Log.ForContext<ToDoController>();
     private readonly IToDoItemRepository _toDoItemRepository;
 
     public ToDoController(IToDoItemRepository toDoItemRepository)
@@ -25,8 +25,6 @@ public class ToDoController : ControllerBase
     [ProducesResponseType(typeof(ResponseDto<List<ToDoItem>?>), StatusCodes.Status200OK)]
     public IActionResult Get([FromQuery] ToDoItemSearchDto search)
     {
-        _log.Information($"{nameof(Get)} search:{search.ToJsonString()}");
-
         // khởi tạo biến response, mặc định là ErrorCode.Unknow 
         var response = new ResponseDto<List<ToDoItem>?>();
 
