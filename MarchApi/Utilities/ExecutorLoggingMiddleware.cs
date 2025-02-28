@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace MarchApi.Utils;
+namespace MarchApi.Utilities;
 
 /// <summary> Middleware for getting user from jwt token and log it </summary>
 public class ExecutorLoggingMiddleware

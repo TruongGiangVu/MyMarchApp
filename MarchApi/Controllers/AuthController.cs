@@ -25,20 +25,23 @@ public class AuthController : ControllerBase
     public IActionResult Login([FromBody] LoginReqDto input)
     {
         _log.Information($"{nameof(Login)} userId:{input.UserId}");
+        
+        // chuẩn bị trước response trả về
         var response = new ResponseDto<LoginResDto?>();
 
         (ErrorCode code, string message, AppUser? user, string? token) = _authService.Authenticate(input);
+        
+        // cập nhật code và message của biến response
+        response.SetProperties(code, message);
+        _log.Information($"{nameof(Login)} return: {response.ToLogString()}");
 
+        // nếu thành công thì thêm thông tin user và token vào response
         if (code == ErrorCode.Success)
         {
-            response.SetProperties(code, message);
             response.AttachPayload(new LoginResDto(user, token));
-            return Ok(response);
+            _log.Information($"{nameof(Login)} payload: {response.Payload?.ToLogString()}");
         }
-        else
-        {
-            response.SetProperties(code, message);
-            return Ok(response);
-        }
+
+        return Ok(response);
     }
 }

@@ -6,7 +6,6 @@ namespace MarchApi.Controllers;
 [Route("[controller]")]
 public class HomeController : ControllerBase
 {
-    
     [HttpGet]
     public IActionResult Index()
     {

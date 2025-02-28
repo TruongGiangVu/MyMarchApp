@@ -25,12 +25,18 @@ public class TokenService : ITokenService
 
         try
         {
+            // tạo list claim với 1 số thông tin cần thiết cho token
             Claim[]? claims = [
-                new Claim(ClaimTypes.NameIdentifier, appUser.UserId)
+                new Claim(ClaimTypes.NameIdentifier, appUser.UserId),
+                new Claim(ClaimTypes.Name, appUser.UserName),
+                new Claim(ClaimTypes.Role, appUser.Role)
             ];
 
+            // tạo key với sign
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_tokenSettings.SecretKey));
             var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            // tạo token
             var token = new JwtSecurityToken(
                 _tokenSettings.Issuer, null,
                 claims,
@@ -38,7 +44,7 @@ public class TokenService : ITokenService
                 signingCredentials: signIn);
 
             string tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
-            _log.Information($"{nameof(GenerateToken)} tokenValue: {tokenValue}");
+            // _log.Information($"{nameof(GenerateToken)} tokenValue: {tokenValue}");
 
             return tokenValue;
         }

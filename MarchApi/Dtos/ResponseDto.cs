@@ -4,13 +4,19 @@ using MarchApi.Enums;
 
 namespace MarchApi.Dtos;
 
+/// <summary>
+/// wrapper class for responsing from api
+/// </summary>
 public class ResponseDto
 {
     [JsonPropertyOrder(1)]
-    public bool IsSuccess => Code == ErrorCode.Success;
+    public bool IsSuccess => ErrCode == ErrorCode.Success;
 
     [JsonPropertyOrder(2)]
-    public ErrorCode Code { get; set; } = ErrorCode.Unknow;
+    public string Code => ErrCode.ToErrorCodeString();
+
+    [JsonIgnore]
+    public ErrorCode ErrCode { get; set; } = ErrorCode.Unknow;
 
     [JsonPropertyOrder(3)]
     public string Message { get; set; } = string.Empty;
@@ -26,11 +32,20 @@ public class ResponseDto
 
     public void SetProperties(ErrorCode code = ErrorCode.Unknow, string? message = null, List<string>? details = null)
     {
-        Code = code;
+        ErrCode = code;
         Message = string.IsNullOrEmpty(message) ?
-                            Code.GetDisplay() :
+                            ErrCode.GetDisplay() :
                             message;
         Details = details;
+    }
+    public void Success()
+    {
+        SetProperties(ErrorCode.Success);
+    }
+
+    public string ToLogString()
+    {
+        return $"Code:{Code}, Message:{Message}, Details:{Details.ToJsonString()}";
     }
 }
 
@@ -49,4 +64,10 @@ public class ResponseDto<T> : ResponseDto
     }
 
     public void AttachPayload(T? payload) => Payload = payload;
+
+    public void Success(T? payload = default)
+    {
+        base.Success();
+        AttachPayload(payload);
+    }
 }
