@@ -16,7 +16,7 @@ public class ResponseDto
     public string Code => ErrCode.ToErrorCodeString();
 
     [JsonIgnore]
-    public ErrorCode ErrCode { get; set; } = ErrorCode.Unknow;
+    public ErrorCode ErrCode { get; set; } = ErrorCode.UnKnow;
 
     [JsonPropertyOrder(3)]
     public string Message { get; set; } = string.Empty;
@@ -25,12 +25,12 @@ public class ResponseDto
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<string>? Details { get; set; } = null;
 
-    public ResponseDto(ErrorCode code = ErrorCode.Unknow, string? message = null, List<string>? details = null)
+    public ResponseDto(ErrorCode code = ErrorCode.UnKnow, string? message = null, List<string>? details = null)
     {
         SetProperties(code, message, details);
     }
 
-    public void SetProperties(ErrorCode code = ErrorCode.Unknow, string? message = null, List<string>? details = null)
+    public void SetProperties(ErrorCode code = ErrorCode.UnKnow, string? message = null, List<string>? details = null)
     {
         ErrCode = code;
         Message = string.IsNullOrEmpty(message) ?
@@ -55,7 +55,7 @@ public class ResponseDto<T> : ResponseDto
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public T? Payload { get; set; } = default;
 
-    public ResponseDto(ErrorCode code = ErrorCode.Unknow,
+    public ResponseDto(ErrorCode code = ErrorCode.UnKnow,
                     string? message = null,
                     T? payload = default,
                     List<string>? details = null) : base(code, message, details)

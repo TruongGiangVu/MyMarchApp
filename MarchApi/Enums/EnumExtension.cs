@@ -3,6 +3,7 @@ using System.Reflection;
 
 namespace MarchApi.Enums;
 
+/// <summary> Các hàm mở rộng của enum </summary>
 public static class EnumExtension
 {
     /// <summary>

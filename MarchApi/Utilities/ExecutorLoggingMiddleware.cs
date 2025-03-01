@@ -16,7 +16,7 @@ public class ExecutorLoggingMiddleware
     {
         // Extract user info from the JWT token or set to "Anonymous" if not available
         string executor = "Anonymous"; // Default to Anonymous
-        string? userId = context.User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? null;
+        string? userId = context.GetUserIdFromJwt();
         if (userId is not null)
         {
             executor = userId;  // Use the user ID from the JWT token

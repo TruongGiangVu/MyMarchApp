@@ -7,8 +7,8 @@ namespace MarchApi.Repositories;
 public interface IToDoItemRepository
 {
     List<ToDoItem>? GetAll(ToDoItemSearchDto search);
-    ToDoItem? GetById(long id);
+    ToDoItem? GetById(string id);
     DbReturn Insert(ToDoItem entity);
     DbReturn Update(ToDoItem entity);
-    DbReturn Delete(long id);
+    DbReturn Delete(string id);
 }

@@ -74,12 +74,12 @@ builder.Services.AddSwaggerGen(options =>
     }
 );
 
-// * map appsetting.json trường TokenSettings với class TokenSettings
+// * map appsettings.json trường TokenSettings với class TokenSettings
 IConfigurationSection tokenSettingsConfig = builder.Configuration.GetSection(nameof(TokenSettings));
 builder.Services.Configure<TokenSettings>(tokenSettingsConfig);
 TokenSettings? tokenSettings = tokenSettingsConfig.Get<TokenSettings>();
 
-// * map appsetting.json trường AppSettings với class AppSettings
+// * map appsettings.json trường AppSettings với class AppSettings
 IConfigurationSection appSettingsConfig = builder.Configuration.GetSection(nameof(AppSettings));
 builder.Services.Configure<AppSettings>(appSettingsConfig);
 AppSettings? appSettings = appSettingsConfig.Get<AppSettings>();
@@ -107,6 +107,7 @@ builder.Services.AddAuthentication(options =>
 // * đăng ký repository
 builder.Services.AddDbContext<MarchContext>(o => o.UseSqlite(appSettings?.ConnectionString));
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IToDoItemRepository, ToDoItemRepository>();
 
 // * đăng ký service

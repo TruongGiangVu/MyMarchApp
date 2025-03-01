@@ -18,7 +18,7 @@ public class AuthService : IAuthService
 
     public (ErrorCode code, string message, AppUser? user, string? token) Authenticate(LoginReqDto input)
     {
-        ErrorCode code = ErrorCode.Unknow;
+        ErrorCode code = ErrorCode.UnKnow;
         string? token = null;
 
         // truy vấn user với mật khẩu

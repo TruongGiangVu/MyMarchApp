@@ -25,7 +25,7 @@ public class TokenService : ITokenService
 
         try
         {
-            // tạo list claim với 1 số thông tin cần thiết cho token
+            // tạo list claim với 1 số thông tin cần thiết cho token, những thông này sẽ lưu trong token và có thể truy vấn được
             Claim[]? claims = [
                 new Claim(ClaimTypes.NameIdentifier, appUser.UserId),
                 new Claim(ClaimTypes.Name, appUser.UserName),

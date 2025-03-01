@@ -25,7 +25,7 @@ public class ToDoController : ControllerBase
     [ProducesResponseType(typeof(ResponseDto<List<ToDoItem>?>), StatusCodes.Status200OK)]
     public IActionResult Get([FromQuery] ToDoItemSearchDto search)
     {
-        // khởi tạo biến response, mặc định là ErrorCode.Unknow 
+        // khởi tạo biến response, mặc định là ErrorCode.UnKnow 
         var response = new ResponseDto<List<ToDoItem>?>();
 
         // truy vấn item từ db
@@ -75,7 +75,7 @@ public class ToDoController : ControllerBase
     /// <summary> Xóa 1 ToDo item đã tồn tại </summary>
     [HttpDelete("{id}")]
     [ProducesResponseType(typeof(ResponseDto), StatusCodes.Status200OK)]
-    public IActionResult Delete([FromRoute] long id)
+    public IActionResult Delete([FromRoute] string id)
     {
         var response = new ResponseDto();
 
