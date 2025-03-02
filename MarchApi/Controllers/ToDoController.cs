@@ -2,11 +2,10 @@ using MarchApi.Dtos;
 using MarchApi.Enums;
 using MarchApi.Models;
 using MarchApi.Repositories.Interfaces;
+using MarchApi.Services.Interfaces;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
-using SQLitePCL;
 
 namespace MarchApi.Controllers;
 
@@ -17,10 +16,12 @@ public class ToDoController : ControllerBase
 {
     private readonly Serilog.ILogger _log = Log.ForContext<ToDoController>();
     private readonly IToDoItemRepository _toDoItemRepository;
+    private readonly IToDoService _toDoService;
 
-    public ToDoController(IToDoItemRepository toDoItemRepository)
+    public ToDoController(IToDoItemRepository toDoItemRepository, IToDoService toDoService)
     {
         _toDoItemRepository = toDoItemRepository;
+        _toDoService = toDoService;
     }
 
     /// <summary> Truy vấn danh sách todo item </summary>
@@ -83,23 +84,9 @@ public class ToDoController : ControllerBase
     public IActionResult Create([FromBody] ToDoItemDto input)
     {
         // khởi tạo response
-        var response = new ResponseDto();
         _log.Information($"{nameof(Create)} input: {input.ToJsonString()}");
 
-        (bool isValid, string message) = ValidateInput(input);
-        if (isValid == false) // nếu dữ liệu validate sai đặc tả
-        {
-            response.SetProperties(ErrorCode.Invalid, message);
-        }
-        else // nếu validate pass
-        {
-            // thực hiện thêm item
-            DbReturn dbReturn = _toDoItemRepository.Insert(input);
-
-            // cập nhật lại response từ kết quả gọi db
-            response.SetProperties(dbReturn.Code, dbReturn.Message);
-        }
-
+        ResponseDto response = _toDoService.CreateToDoItem(input);
 
         _log.Information($"{nameof(Create)} response: {response.ToJsonString()}");
         return Ok(response);
@@ -110,22 +97,9 @@ public class ToDoController : ControllerBase
     [ProducesResponseType(typeof(ResponseDto), StatusCodes.Status200OK)]
     public IActionResult Update([FromBody] ToDoItemDto input)
     {
-        var response = new ResponseDto();
         _log.Information($"{nameof(Update)} input: {input.ToJsonString()}");
 
-        (bool isValid, string message) = ValidateInput(input);
-        if (isValid == false) // nếu dữ liệu validate sai đặc tả
-        {
-            response.SetProperties(ErrorCode.Invalid, message);
-        }
-        else // nếu validate pass
-        {
-            // thực hiện thêm item
-            DbReturn dbReturn = _toDoItemRepository.Update(input);
-
-            // cập nhật lại response từ kết quả gọi db
-            response.SetProperties(dbReturn.Code, dbReturn.Message);
-        }
+        ResponseDto response = _toDoService.UpdateToDoItem(input);
 
         _log.Information($"{nameof(Update)} response: {response.ToJsonString()}");
         return Ok(response);
@@ -144,25 +118,5 @@ public class ToDoController : ControllerBase
 
         _log.Information($"{nameof(Delete)} response: {response.ToJsonString()}");
         return Ok(response);
-    }
-
-    /// <summary> Kiểm tra dữ liệu ToDoItemDto </summary>
-    private static (bool isValid, string message) ValidateInput(ToDoItemDto input)
-    {
-        bool isValid = true;
-        string message = string.Empty;
-
-        if (string.IsNullOrWhiteSpace(input.Name)) // nếu name rỗng
-        {
-            isValid = false;
-            message = "Tên không được để trống";
-        }
-        else if (input.Priority is null) // nếu Priority bằng null
-        {
-            isValid = false;
-            message = "Độ ưu tiên không được để trống";
-        }
-        return (isValid, message);
-
     }
 }
