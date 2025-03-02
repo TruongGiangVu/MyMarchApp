@@ -2,7 +2,7 @@ using MarchApi.Dtos;
 using MarchApi.Enums;
 using MarchApi.Models;
 
-namespace MarchApi.Services;
+namespace MarchApi.Services.Interfaces;
 
 /// <summary> Service for Authenticate and Authorize </summary>
 public interface IAuthService

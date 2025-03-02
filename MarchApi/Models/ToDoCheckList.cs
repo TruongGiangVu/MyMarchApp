@@ -3,16 +3,18 @@ using System.Text.Json.Serialization;
 
 namespace MarchApi.Models;
 
-public class ToDoTag
+public class ToDoCheckList
 {
     [Key]
     public string Id { get; set; } = string.Empty;
     public string Text { get; set; } = string.Empty;
-    public string Color { get; set; } = string.Empty;
+    public bool IsDone { get; set; } = false;
 
     // relation
+    public string? ToDoItemId { get; set; }
+
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public List<ToDoItem>? ToDoItems { get; set; }
+    public ToDoItem? ToDoItem { get; set; } // Navigation Property
 
     // audit properties
     public DateTime? CreatedTime { get; set; }
@@ -20,11 +22,11 @@ public class ToDoTag
     public DateTime? UpdatedTime { get; set; }
     public string? UpdatedBy { get; set; }
 
-    public ToDoTag(string id, string text, string color)
+    public ToDoCheckList(string id, string text, bool isDone)
     {
         Id = id;
         Text = text;
-        Color = color;
+        IsDone = isDone;
     }
 
 }

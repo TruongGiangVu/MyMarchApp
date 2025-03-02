@@ -1,7 +1,7 @@
 using MarchApi.Dtos;
 using MarchApi.Enums;
 using MarchApi.Models;
-using MarchApi.Services;
+using MarchApi.Services.Interfaces;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,12 +25,12 @@ public class AuthController : ControllerBase
     public IActionResult Login([FromBody] LoginReqDto input)
     {
         _log.Information($"{nameof(Login)} userId:{input.UserId}");
-        
+
         // chuẩn bị trước response trả về
         var response = new ResponseDto<LoginResDto?>();
 
         (ErrorCode code, string message, AppUser? user, string? token) = _authService.Authenticate(input);
-        
+
         // cập nhật code và message của biến response
         response.SetProperties(code, message);
         _log.Information($"{nameof(Login)} return: {response.ToLogString()}");

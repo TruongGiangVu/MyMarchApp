@@ -1,40 +1,47 @@
+using MarchApi.Dtos;
 using MarchApi.Enums;
 using MarchApi.Models;
+using MarchApi.Repositories.Interfaces;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace MarchApi.Repositories;
+namespace MarchApi.Repositories.Implements;
 
-public class TagRepository : BaseRepository, ITagRepository
+public class ToDoItemRepository : BaseRepository, IToDoItemRepository
 {
-private readonly Serilog.ILogger _log = Log.ForContext<TagRepository>();
+    private readonly Serilog.ILogger _log = Log.ForContext<ToDoItemRepository>();
     private readonly MarchContext _context;
-    public TagRepository(MarchContext context, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
+    public ToDoItemRepository(MarchContext context, IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
     {
         _context = context;
     }
-    public List<ToDoTag>? GetAll()
+    public List<ToDoItem>? GetAll(ToDoItemSearchDto search)
     {
+        _log.Information($"{nameof(GetAll)} search:{search.ToJsonString()}");
+
         // thực hiện tìm kiếm theo class search
-        List<ToDoTag>? res = _context.ToDoTags.ToList();
+        List<ToDoItem>? res = _context.ToDoItems.Where(p =>
+            (string.IsNullOrWhiteSpace(search.Name) || p.Name.Contains(search.Name))
+            && (search.Priority == null || p.Priority == search.Priority)
+        ).ToList();
 
         _log.Information($"{nameof(GetAll)} return count: {res.Count}");
         return res;
     }
 
-    public ToDoTag? GetById(string id)
+    public ToDoItem? GetById(string id)
     {
-        ToDoTag? res = _context.ToDoTags.Where(p => p.Id == id).FirstOrDefault();
+        ToDoItem? res = _context.ToDoItems.Where(p => p.Id == id).FirstOrDefault();
         _log.Information($"{nameof(GetById)} return: {res.ToJsonString()}");
         return res;
     }
 
-    public DbReturn Insert(ToDoTag entity)
+    public DbReturn Insert(ToDoItemDto dto)
     {
-        _log.Information($"{nameof(Insert)} input: {entity.ToJsonString()}");
         DbReturn dbReturn = new();
 
+        var entity = new ToDoItem(dto);
         // lấy userId hiện tại từ jwt token và set thời gian create update cho entity
         string? userId = GetCurrentUserId();
         DateTime time = DateTime.Now;
@@ -43,8 +50,13 @@ private readonly Serilog.ILogger _log = Log.ForContext<TagRepository>();
         entity.UpdatedBy = userId;
         entity.UpdatedTime = time;
 
+        // tạo id mới
+        entity.Id = Guid.NewGuid().ToString();
+
+        _log.Information($"{nameof(Insert)} input: {entity.ToJsonString()}");
+
         // thêm vào db và commit lại
-        _context.ToDoTags.Add(entity);
+        _context.ToDoItems.Add(entity);
         _context.SaveChanges();
 
         // nếu thành công set lại code và message trả về
@@ -54,25 +66,27 @@ private readonly Serilog.ILogger _log = Log.ForContext<TagRepository>();
         return dbReturn;
     }
 
-    public DbReturn Update(ToDoTag entity)
+    public DbReturn Update(ToDoItemDto dto)
     {
-        _log.Information($"{nameof(Update)} input: {entity.ToJsonString()}");
         DbReturn dbReturn = new();
 
         // kiểm tra xem id này có tồn tại không
-        bool isExist = IsExist(entity.Id);
+        ToDoItem? entity = FindById(dto.Id ?? string.Empty);
 
-        if (isExist) // nếu tồn tại thì cập nhật
+        if (entity is not null) // nếu tồn tại thì cập nhật
         {
+            entity.ConvertFromDto(dto);
             // lấy userId hiện tại từ jwt token và set thời gian update cho entity
             entity.UpdatedBy = GetCurrentUserId();
             entity.UpdatedTime = DateTime.Now;
 
+            _log.Information($"{nameof(Update)} input: {entity.ToJsonString()}");
+
             // cập nhật entity vào db và commit lại
-            EntityEntry<ToDoTag> entry = _context.Entry(entity);
+            EntityEntry<ToDoItem> entry = _context.Entry(entity);
             if (entry.State == EntityState.Detached)
             {
-                _context.ToDoTags.Attach(entity);
+                _context.ToDoItems.Attach(entity);
             }
             entry.State = EntityState.Modified;
             _context.SaveChanges();
@@ -93,16 +107,16 @@ private readonly Serilog.ILogger _log = Log.ForContext<TagRepository>();
         DbReturn dbReturn = new();
 
         // truy vấn entity này theo id
-        ToDoTag? entity = FindById(id);
+        ToDoItem? entity = FindById(id);
 
         if (entity is not null) // nếu entity này tìm thấy xóa entity này
         {
             // thực hiện xóa entity này và commit lại
             if (_context.Entry(entity).State == EntityState.Detached)
             {
-                _context.ToDoTags.Attach(entity);
+                _context.ToDoItems.Attach(entity);
             }
-            _context.ToDoTags.Remove(entity);
+            _context.ToDoItems.Remove(entity);
             _context.SaveChanges();
             dbReturn.SetProperties(ErrorCode.Success);
         }
@@ -115,14 +129,14 @@ private readonly Serilog.ILogger _log = Log.ForContext<TagRepository>();
         return dbReturn;
     }
 
-    private bool IsExist(string id)
+    public bool IsExist(string id)
     {
-        return _context.ToDoTags.Any(p => p.Id == id);
+        return _context.ToDoItems.Any(p => p.Id == id);
     }
 
-    private ToDoTag? FindById(string id)
+    public ToDoItem? FindById(string id)
     {
-        var entity = _context.ToDoTags.Where(p => p.Id == id).FirstOrDefault();
+        ToDoItem? entity = _context.ToDoItems.Where(p => p.Id == id).FirstOrDefault();
         return entity;
     }
 }

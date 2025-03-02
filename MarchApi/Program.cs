@@ -2,8 +2,10 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 
-using MarchApi.Repositories;
-using MarchApi.Services;
+using MarchApi.Repositories.Implements;
+using MarchApi.Repositories.Interfaces;
+using MarchApi.Services.Implements;
+using MarchApi.Services.Interfaces;
 using MarchApi.Settings;
 using MarchApi.Utilities;
 
@@ -104,15 +106,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddHttpContextAccessor();
+
 // * đăng ký repository
 builder.Services.AddDbContext<MarchContext>(o => o.UseSqlite(appSettings?.ConnectionString));
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IToDoItemRepository, ToDoItemRepository>();
+builder.Services.AddScoped<IToDoCheckListRepository, ToDoCheckListRepository>();
 
 // * đăng ký service
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IToDoService, ToDoService>();
 
 var app = builder.Build();
 
@@ -135,6 +141,9 @@ else
 }
 
 app.UseHttpsRedirection();
+
+// thêm middleware để log nếu api trả về http status code 401 hoặc 403
+app.UseMiddleware<AuthorizationLoggingMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

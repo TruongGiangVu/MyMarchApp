@@ -1,7 +1,8 @@
 using MarchApi.Dtos;
 using MarchApi.Models;
+using MarchApi.Repositories.Interfaces;
 
-namespace MarchApi.Repositories;
+namespace MarchApi.Repositories.Implements;
 
 public class AuthRepository : IAuthRepository
 {

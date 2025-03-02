@@ -1,7 +1,7 @@
 using MarchApi.Dtos;
 using MarchApi.Models;
 
-namespace MarchApi.Repositories;
+namespace MarchApi.Repositories.Interfaces;
 
 /// <summary> Auth repository </summary>
 public interface IAuthRepository

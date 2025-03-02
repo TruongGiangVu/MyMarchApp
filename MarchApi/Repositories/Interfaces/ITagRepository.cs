@@ -1,6 +1,6 @@
 using MarchApi.Models;
 
-namespace MarchApi.Repositories;
+namespace MarchApi.Repositories.Interfaces;
 
 public interface ITagRepository
 {
@@ -9,4 +9,7 @@ public interface ITagRepository
     DbReturn Insert(ToDoTag entity);
     DbReturn Update(ToDoTag entity);
     DbReturn Delete(string id);
+
+    bool IsExist(string id);
+    ToDoTag? FindById(string id);
 }

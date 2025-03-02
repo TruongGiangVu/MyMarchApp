@@ -1,6 +1,6 @@
 using MarchApi.Utilities;
 
-namespace MarchApi.Repositories;
+namespace MarchApi.Repositories.Implements;
 
 public class BaseRepository
 {

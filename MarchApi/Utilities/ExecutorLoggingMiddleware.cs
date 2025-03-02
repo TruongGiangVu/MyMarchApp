@@ -1,5 +1,3 @@
-using System.Security.Claims;
-
 namespace MarchApi.Utilities;
 
 /// <summary> Middleware for getting user from jwt token and log it </summary>

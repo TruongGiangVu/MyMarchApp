@@ -5,7 +5,7 @@ using MarchApi.Enums;
 namespace MarchApi.Dtos;
 
 /// <summary>
-/// wrapper class for responsing from api
+/// wrapper class for responding from api
 /// </summary>
 public class ResponseDto
 {

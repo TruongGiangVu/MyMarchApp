@@ -1,6 +1,6 @@
 using MarchApi.Models;
 
-namespace MarchApi.Services;
+namespace MarchApi.Services.Interfaces;
 
 /// <summary> Service for managing token </summary>
 public interface ITokenService

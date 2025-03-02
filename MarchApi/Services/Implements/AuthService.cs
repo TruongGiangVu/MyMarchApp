@@ -1,9 +1,10 @@
 using MarchApi.Dtos;
 using MarchApi.Enums;
 using MarchApi.Models;
-using MarchApi.Repositories;
+using MarchApi.Repositories.Interfaces;
+using MarchApi.Services.Interfaces;
 
-namespace MarchApi.Services;
+namespace MarchApi.Services.Implements;
 
 public class AuthService : IAuthService
 {

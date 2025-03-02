@@ -3,12 +3,13 @@ using System.Security.Claims;
 using System.Text;
 
 using MarchApi.Models;
+using MarchApi.Services.Interfaces;
 using MarchApi.Settings;
 
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace MarchApi.Services;
+namespace MarchApi.Services.Implements;
 
 public class TokenService : ITokenService
 {
