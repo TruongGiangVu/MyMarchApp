@@ -83,12 +83,15 @@ public class ToDoItemRepository : BaseRepository, IToDoItemRepository
             _log.Information($"{nameof(Update)} input: {entity.ToJsonString()}");
 
             // cập nhật entity vào db và commit lại
-            EntityEntry<ToDoItem> entry = _context.Entry(entity);
-            if (entry.State == EntityState.Detached)
-            {
-                _context.ToDoItems.Attach(entity);
-            }
-            entry.State = EntityState.Modified;
+            _context.ToDoItems.Update(entity);
+            
+            // EntityEntry<ToDoItem> entry = _context.Entry(entity);
+            // if (entry.State == EntityState.Detached)
+            // {
+            //     _context.ToDoItems.Attach(entity);
+            // }
+            // entry.State = EntityState.Modified;
+
             _context.SaveChanges();
             dbReturn.SetProperties(ErrorCode.Success);
         }
@@ -112,11 +115,13 @@ public class ToDoItemRepository : BaseRepository, IToDoItemRepository
         if (entity is not null) // nếu entity này tìm thấy xóa entity này
         {
             // thực hiện xóa entity này và commit lại
-            if (_context.Entry(entity).State == EntityState.Detached)
-            {
-                _context.ToDoItems.Attach(entity);
-            }
             _context.ToDoItems.Remove(entity);
+            
+            // if (_context.Entry(entity).State == EntityState.Detached)
+            // {
+            //     _context.ToDoItems.Attach(entity);
+            // }
+            
             _context.SaveChanges();
             dbReturn.SetProperties(ErrorCode.Success);
         }
