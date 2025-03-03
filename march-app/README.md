@@ -38,4 +38,6 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## References
 
-- https://github.com/nextauthjs/next-auth/discussions/9274https://github.com/nextauthjs/next-auth/discussions/9274
+- nextjs change authJs baseUrl: https://github.com/nextauthjs/next-auth/discussions/9274https://github.com/nextauthjs/next-auth/discussions/9274
+
+- mui: https://mui.com/
