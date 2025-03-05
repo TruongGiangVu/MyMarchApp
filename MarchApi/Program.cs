@@ -109,7 +109,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddHttpContextAccessor();
 
 // * đăng ký repository
-builder.Services.AddDbContext<MarchContext>(o => o.UseSqlite(appSettings?.ConnectionString));
+builder.Services.AddDbContext<MarchContext>(o => o.UseOracle(appSettings?.ConnectionString));
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<IToDoItemRepository, ToDoItemRepository>();

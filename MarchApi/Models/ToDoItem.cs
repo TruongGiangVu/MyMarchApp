@@ -1,21 +1,34 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations.Schema;
 
 using MarchApi.Dtos;
 using MarchApi.Enums;
 
 namespace MarchApi.Models;
 
+[Table("TODO_ITEM")]
 public class ToDoItem
 {
 
     // main properties
     [Key]
+    [Column("ID", TypeName = "VARCHAR(100)")]
     public string Id { get; set; } = string.Empty;
+
+    [Column("NAME", TypeName = "VARCHAR(100)")]
     public string Name { get; set; } = string.Empty;
+
+    [Column("RATE", TypeName = "NUMBER")]
     public int? Rate { get; set; }
+
+    [Column("DESCRIPTION", TypeName = "VARCHAR(200)")]
     public string? Description { get; set; }
+
+    [Column("IS_DONE", TypeName = "VARCHAR2(5)")]
     public bool IsDone { get; set; } = false;
+
+    [Column("PRIORITY", TypeName = "VARCHAR2(20)")]
     public PriorityEnum Priority { get; set; } = PriorityEnum.Medium;
 
     // relation
@@ -27,9 +40,16 @@ public class ToDoItem
 
 
     // audit properties
+    [Column("CREATED_TIME", TypeName = "DATE")]
     public DateTime? CreatedTime { get; set; }
+
+    [Column("CREATED_BY", TypeName = "VARCHAR(100)")]
     public string? CreatedBy { get; set; }
+
+    [Column("UPDATED_TIME", TypeName = "DATE")]
     public DateTime? UpdatedTime { get; set; }
+
+    [Column("UPDATED_BY", TypeName = "VARCHAR(100)")]
     public string? UpdatedBy { get; set; }
 
     public ToDoItem()

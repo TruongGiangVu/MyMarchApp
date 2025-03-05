@@ -1,0 +1,2 @@
+insert into DB_USER (USER_ID, USER_NAME, ROLE, PASSWORD) VALUES ('admin','admin name', 'ADMIN', '123456');
+insert into DB_USER (USER_ID, USER_NAME, ROLE, PASSWORD) VALUES ('giang','giang name', 'USER', '123456');
