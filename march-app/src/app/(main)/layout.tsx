@@ -1,7 +1,6 @@
-import { ThemeProvider } from "@/context/theme.context"
-import Header from "./header"
-import Sidebar from "./sidebar"
-import { Box } from "@mui/material"
+import Header from "@/components/layout/header";
+import Sidebar from "@/components/layout/sidebar";
+import { Box } from "@mui/material";
 
 export default function MainLayout ({
     children,
@@ -9,7 +8,7 @@ export default function MainLayout ({
     children: React.ReactNode;
   }>)  {
     return (
-        <ThemeProvider>
+        <>
           {/* Fixed Header */}
           <Header />
 
@@ -22,6 +21,6 @@ export default function MainLayout ({
               {children}
             </Box>
           </Box>
-        </ThemeProvider>
+        </>
     )
 }

@@ -5,6 +5,7 @@ import { ExpandLess, ExpandMore, Menu } from "@mui/icons-material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Link from "next/link";
+import { useAppContext } from "@/context/app.context";
 
 
 const navigation = [
@@ -20,10 +21,10 @@ const navigation = [
 ];
 
 export default function Sidebar() {
-  const [open, setOpen] = useState(true);
+  const {collapseMenu, setCollapseMenu} = useAppContext()!;
   const [openItems, setOpenItems] = useState<{ [key: string]: boolean }>({});
 
-  const toggleSidebar = () => setOpen(!open);
+  const toggleSidebar = () => setCollapseMenu(!collapseMenu);
   const toggleItem = (title: string) => {
     setOpenItems((prev) => ({ ...prev, [title]: !prev[title] }));
   };
@@ -32,10 +33,10 @@ export default function Sidebar() {
     <Drawer
       variant="permanent"
       sx={{
-        width: open ? 240 : 64,
+        width: !collapseMenu ? 240 : 64,
         flexShrink: 0,
         "& .MuiDrawer-paper": {
-          width: open ? 240 : 64,
+          width: !collapseMenu ? 240 : 64,
           transition: "width 0.3s",
           overflowX: "hidden",
           mt: "64px", // Push below header
@@ -52,10 +53,10 @@ export default function Sidebar() {
           <div key={item.title}>
             <ListItemButton onClick={() => item.children ? toggleItem(item.title) : null} component={Link} href={item.path || "#"}>
               <ListItemIcon>{item.icon}</ListItemIcon>
-              {open && <ListItemText primary={item.title} />}
-              {item.children && open && (openItems[item.title] ? <ExpandLess /> : <ExpandMore />)}
+              {!collapseMenu && <ListItemText primary={item.title} />}
+              {item.children && !collapseMenu && (openItems[item.title] ? <ExpandLess /> : <ExpandMore />)}
             </ListItemButton>
-            {item.children && open && (
+            {item.children && !collapseMenu && (
               <Collapse in={openItems[item.title]} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   {item.children.map((child) => (
