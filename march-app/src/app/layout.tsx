@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppContextProvider } from "@/context/app.context";
 import NextAuthWrapper from "@/context/next.auth.wrapper";
+import ContextFloatingBtn from "@/components/layout/context.floating.btn";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({
         <AppContextProvider>
           <NextAuthWrapper>
             {children}
+            <ContextFloatingBtn></ContextFloatingBtn>
           </NextAuthWrapper>
         </AppContextProvider>
       </body>

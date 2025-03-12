@@ -1,8 +1,8 @@
 "use client";
 
 import { JSX, useState } from "react";
-import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Collapse, IconButton, Box } from "@mui/material";
-import { ExpandLess, ExpandMore, Menu } from "@mui/icons-material";
+import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Collapse, Box } from "@mui/material";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Link from "next/link";
@@ -34,10 +34,9 @@ const navigation: NavItem[] = [
 ];
 
 export default function Sidebar() {
-  const { collapseMenu, toggleMenuCollapse } = useAppContext()!;
+  const { collapseMenu } = useAppContext()!;
   const [openItems, setOpenItems] = useState<{ [key: string]: boolean }>({});
 
-  const toggleSidebar = () => toggleMenuCollapse();
   const toggleItem = (title: string) => {
     setOpenItems((prev) => ({ ...prev, [title]: !prev[title] }));
   };
@@ -82,9 +81,6 @@ export default function Sidebar() {
       }}
     >
       <Box sx={{ display: "flex", justifyContent: "center", p: 1 }}>
-        <IconButton onClick={toggleSidebar}>
-          <Menu />
-        </IconButton>
       </Box>
       <List>{renderNavItems(navigation)}</List>
     </Drawer>

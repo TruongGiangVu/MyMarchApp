@@ -1,89 +1,121 @@
 "use client";
-import { createContext, useState, useEffect, ReactNode, useContext } from "react";
+
+import { createContext, useState, ReactNode, useContext, useEffect, useMemo } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { getStorage, setStorage } from "@/utils/storage.utils";
+import { initializeStorage, setStorage } from "@/utils/storage.utils";
+import { APP_ALIAS } from "@/core";
 
 type ThemeMode = 'light' | 'dark';
-// type ThemeColor = "blue" | "red" | "green" | "purple";
+export type ThemeColor = "default" | "green" | "orange";
 
 type ContextStore = {
   fontSize: number;
   themeMode: ThemeMode;
+  themeColor: ThemeColor;
   collapseMenu: boolean;
 };
 
-const KEY_APP_CONTEXT: string = 'appContext';
+export const themeColors: Record<ThemeColor, { primary: { main: string }; secondary: { main: string } }> = {
+  default: { primary: { main: "#1976d2" }, secondary: { main: "#dc004e" } }, // MUI default colors
+  green: { primary: { main: "#4CAF50" }, secondary: { main: "#8BC34A" } },
+  orange: { primary: { main: "#FF9800" }, secondary: { main: "#FF5722" } }
+};
+
+const KEY_APP_CONTEXT: string = `${APP_ALIAS}-context`;
+const DEFAULT_VALUES: ContextStore = { fontSize: 14, themeMode: "light", themeColor: "default", collapseMenu: false };
 
 interface AppContextProps {
   themeMode: ThemeMode;
   toggleTheme: () => void;
+  themeColor: ThemeColor;
+  changeThemeColor: (color: ThemeColor) => void;
   fontSize: number;
   changeFontSize: (size: number | number[]) => void;
   collapseMenu: boolean;
   toggleMenuCollapse: () => void;
+  resetToDefault: () => void;
 }
 
 export const AppContext = createContext<AppContextProps | null | undefined>(undefined);
 
 export function AppContextProvider({ children }: { children: ReactNode }) {
-  const [themeMode, setThemeMode] = useState<ThemeMode>('light');
+  const [mounted, setMounted] = useState(false);
+  const [themeMode, setThemeMode] = useState<ThemeMode>("light");
+  const [themeColor, setThemeColor] = useState<ThemeColor>("default");
   const [collapseMenu, setCollapseMenu] = useState(false);
   const [fontSize, setFontSize] = useState(14);
 
   useEffect(() => {
-    let store: ContextStore | null = getStorage<ContextStore>(KEY_APP_CONTEXT);
-    if (store) {
-      setThemeMode(store.themeMode);
-      changeFontSize(store.fontSize);
-      setCollapseMenu(store.collapseMenu);
-    } else {
-      store = {
-        fontSize, collapseMenu, themeMode
-      };
-      setStorage(KEY_APP_CONTEXT, store);
-    }
+    // Only run on client
+    const storedContext = initializeStorage(KEY_APP_CONTEXT, DEFAULT_VALUES);
+    setThemeMode(storedContext.themeMode);
+    setThemeColor(storedContext.themeColor);
+    setCollapseMenu(storedContext.collapseMenu);
+    setFontSize(storedContext.fontSize);
+    setMounted(true); // ✅ set mount true
+  }, []);
 
-  }, [collapseMenu, fontSize, themeMode]);
+  const updateStorage = (updatedValues: Partial<ContextStore>) => {
+    setStorage(KEY_APP_CONTEXT, { themeMode, themeColor, collapseMenu, fontSize, ...updatedValues });
+  };
 
   const toggleTheme = () => {
-    const store: ContextStore | null = getStorage<ContextStore>(KEY_APP_CONTEXT);
-    if (store) {
-      const newThemeMode = store.themeMode === "light" ? "dark" : "light"; // ✅ Correct toggle logic
-      setThemeMode(newThemeMode); // ✅ Update state properly
-      setStorage(KEY_APP_CONTEXT, { ...store, themeMode: newThemeMode }); // ✅ Store updated value
-    }
+    setThemeMode((prev) => {
+      const newThemeMode = prev === "light" ? "dark" : "light";
+      updateStorage({ themeMode: newThemeMode });
+      return newThemeMode;
+    });
+  };
+
+  const changeThemeColor = (color: ThemeColor) => {
+    setThemeColor(color);
+    updateStorage({ themeColor: color });
   };
 
   const changeFontSize = (size: number | number[]) => {
-    const store: ContextStore | null = getStorage<ContextStore>(KEY_APP_CONTEXT);
-    if (store) {
-      const newFontSize = Array.isArray(size) ? size[0] ?? 14 : size; // ✅ Ensure valid number
-      setFontSize(newFontSize); // ✅ Update React state
-      setStorage(KEY_APP_CONTEXT, { ...store, fontSize: newFontSize }); // ✅ Update storage
-    }
+    const newFontSize = Array.isArray(size) ? size[0] ?? DEFAULT_VALUES.fontSize : size;
+    setFontSize(newFontSize);
+    updateStorage({ fontSize: newFontSize });
   };
 
   const toggleMenuCollapse = () => {
-    const store: ContextStore | null = getStorage<ContextStore>(KEY_APP_CONTEXT);
-    if (store) {
-      const newCollapseMenu = !store.collapseMenu; // ✅ Ensure valid number
-      setCollapseMenu(newCollapseMenu); // ✅ Update React state
-      setStorage(KEY_APP_CONTEXT, { ...store, collapseMenu: newCollapseMenu }); // ✅ Update storage
-    }
+    setCollapseMenu((prev) => {
+      const newCollapseState = !prev;
+      updateStorage({ collapseMenu: newCollapseState });
+      return newCollapseState;
+    });
   };
 
-  const theme = createTheme({
-    palette: {
-      mode: themeMode,
-    },
-    typography: {
-      fontSize: fontSize, // Apply the dynamic font size
-    },
-  });
+  const resetToDefault = () => {
+    setThemeMode(DEFAULT_VALUES.themeMode);
+    setThemeColor(DEFAULT_VALUES.themeColor);
+    setFontSize(DEFAULT_VALUES.fontSize);
+    setCollapseMenu(DEFAULT_VALUES.collapseMenu);
+
+    updateStorage(DEFAULT_VALUES);
+  };
+
+  // Memoize theme to prevent re-renders
+  const theme = useMemo(() => {
+    // Ensure themeColor is always valid
+    const selectedTheme = themeColors[themeColor] || themeColors["default"];
+
+    return createTheme({
+      palette: {
+        mode: themeMode,
+        primary: selectedTheme.primary,
+        secondary: selectedTheme.secondary
+      },
+      typography: { fontSize }
+    });
+  }, [themeMode, themeColor, fontSize]);
+
+  // Prevent rendering until mounted to avoid hydration issues
+  if (!mounted) return null;
 
   return (
-    <AppContext.Provider value={{ themeMode, toggleTheme, fontSize: fontSize, changeFontSize, collapseMenu, toggleMenuCollapse }}>
+    <AppContext.Provider value={{ themeMode, toggleTheme, themeColor, changeThemeColor, fontSize, changeFontSize, collapseMenu, toggleMenuCollapse, resetToDefault }}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {children}
