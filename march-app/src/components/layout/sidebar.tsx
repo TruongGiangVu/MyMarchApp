@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+
+import { JSX, useState } from "react";
 import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Collapse, IconButton, Box } from "@mui/material";
 import { ExpandLess, ExpandMore, Menu } from "@mui/icons-material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -7,26 +8,63 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import Link from "next/link";
 import { useAppContext } from "@/context/app.context";
 
+type NavItem = {
+  title: string;
+  icon?: JSX.Element;
+  path?: string;
+  children?: NavItem[];
+};
 
-const navigation = [
+const navigation: NavItem[] = [
   { title: "Dashboard", icon: <DashboardIcon />, path: "/" },
   {
     title: "Management",
     icon: <SettingsIcon />,
     children: [
-      { title: "Users", path: "/management/users" },
+      {
+        title: "Users",
+        children: [
+          { title: "Active Users", path: "/management/users/active" },
+          { title: "Banned Users", path: "/management/users/banned" },
+        ],
+      },
       { title: "Reports", path: "/management/reports" },
     ],
   },
 ];
 
 export default function Sidebar() {
-  const {collapseMenu, setCollapseMenu} = useAppContext()!;
+  const { collapseMenu, toggleMenuCollapse } = useAppContext()!;
   const [openItems, setOpenItems] = useState<{ [key: string]: boolean }>({});
 
-  const toggleSidebar = () => setCollapseMenu(!collapseMenu);
+  const toggleSidebar = () => toggleMenuCollapse();
   const toggleItem = (title: string) => {
     setOpenItems((prev) => ({ ...prev, [title]: !prev[title] }));
+  };
+
+  // Recursive rendering function
+  const renderNavItems = (items: NavItem[], level = 0) => {
+    return items.map((item) => (
+      <div key={item.title}>
+        <ListItemButton
+          onClick={() => item.children ? toggleItem(item.title) : null}
+          component={item.path ? Link : "div"}
+          href={item.path || "#"}
+          sx={{ pl: level * 2 }}
+        >
+          {item.icon && <ListItemIcon>{item.icon}</ListItemIcon>}
+          {!collapseMenu && <ListItemText primary={item.title} />}
+          {item.children && !collapseMenu && (openItems[item.title] ? <ExpandLess /> : <ExpandMore />)}
+        </ListItemButton>
+        {item.children && !collapseMenu && (
+          <Collapse in={openItems[item.title]} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {renderNavItems(item.children, level + 1)}
+            </List>
+          </Collapse>
+        )}
+      </div>
+    ));
   };
 
   return (
@@ -48,28 +86,7 @@ export default function Sidebar() {
           <Menu />
         </IconButton>
       </Box>
-      <List>
-        {navigation.map((item) => (
-          <div key={item.title}>
-            <ListItemButton onClick={() => item.children ? toggleItem(item.title) : null} component={Link} href={item.path || "#"}>
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              {!collapseMenu && <ListItemText primary={item.title} />}
-              {item.children && !collapseMenu && (openItems[item.title] ? <ExpandLess /> : <ExpandMore />)}
-            </ListItemButton>
-            {item.children && !collapseMenu && (
-              <Collapse in={openItems[item.title]} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
-                  {item.children.map((child) => (
-                    <ListItemButton key={child.title} component={Link} href={child.path} sx={{ pl: 4 }}>
-                      <ListItemText primary={child.title} />
-                    </ListItemButton>
-                  ))}
-                </List>
-              </Collapse>
-            )}
-          </div>
-        ))}
-      </List>
+      <List>{renderNavItems(navigation)}</List>
     </Drawer>
   );
 }
