@@ -41,3 +41,5 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - nextjs change authJs baseUrl: https://github.com/nextauthjs/next-auth/discussions/9274https://github.com/nextauthjs/next-auth/discussions/9274
 
 - mui: https://mui.com/
+
+- zod vs RHF: https://medium.com/@ctrlaltmonique/how-to-use-react-hook-form-zod-with-next-js-server-actions-437aaca3d72d

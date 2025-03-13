@@ -10,9 +10,6 @@ import {
   Collapse,
   Box,
   Tooltip,
-  Popper,
-  Paper,
-  ClickAwayListener,
 } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -20,6 +17,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAppContext } from "@/context/app.context";
+import { COLLAPSE_MENU_RATIO, EXPANDED_MENU_RATIO } from "@/core";
 
 type NavItem = {
   title: string;
@@ -63,35 +61,12 @@ const navigation: NavItem[] = [
 ];
 
 export default function Sidebar() {
-  const { collapseMenu } = useAppContext()!;
+  const { collapseMenu, fontSize } = useAppContext()!;
   const pathname = usePathname(); // Get current path for active link styling
   const [openItems, setOpenItems] = useState<{ [key: string]: boolean }>({});
-  const [anchorEls, setAnchorEls] = useState<{ [key: string]: HTMLElement | null }>({});
-  const [hoverItem, setHoverItem] = useState<NavItem | null>(null);
-  const [hoverLevel, setHoverLevel] = useState<number>(0);
-  const [isHoveringPopper, setIsHoveringPopper] = useState(false);
 
   const toggleItem = (title: string) => {
     setOpenItems((prev) => ({ ...prev, [title]: !prev[title] }));
-  };
-
-  const handleMouseEnter = (event: React.MouseEvent<HTMLElement>, item: NavItem, level: number) => {
-    if (collapseMenu && item.children) {
-      setAnchorEls((prev) => ({ ...prev, [level]: event.currentTarget }));
-      setHoverItem(item);
-      setHoverLevel(level);
-      setIsHoveringPopper(true);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setTimeout(() => {
-      if (!isHoveringPopper) {
-        setAnchorEls({});
-        setHoverItem(null);
-        setHoverLevel(0);
-      }
-    }, 200);
   };
 
   const isActive = (path?: string) => path && pathname.startsWith(path);
@@ -107,15 +82,14 @@ export default function Sidebar() {
               component={item.path ? Link : "div"}
               href={item.path || "#"}
               sx={{
-                pl: collapseMenu ? 1 : level * 2,
+                pl: collapseMenu ? 2 : level * 2,
                 justifyContent: "center",
-                backgroundColor: active ? "rgba(25, 118, 210, 0.2)" : "transparent",
+                backgroundColor: active ? "primary.light" : "transparent",
                 "&:hover": {
-                  backgroundColor: "rgba(25, 118, 210, 0.1)",
+                  backgroundColor: "primary.light",
                 },
               }}
-              onMouseEnter={(e) => handleMouseEnter(e, item, level)}
-              onMouseLeave={handleMouseLeave}
+
             >
               {item.icon && (
                 <ListItemIcon sx={{ minWidth: 40, color: active ? "primary.main" : "inherit" }}>
@@ -144,85 +118,18 @@ export default function Sidebar() {
       <Drawer
         variant="permanent"
         sx={{
-          width: collapseMenu ? 64 : 240,
+          width: collapseMenu ? fontSize * COLLAPSE_MENU_RATIO : fontSize * EXPANDED_MENU_RATIO,
           flexShrink: 0,
           "& .MuiDrawer-paper": {
-            width: collapseMenu ? 64 : 240,
+            width: collapseMenu ? fontSize * COLLAPSE_MENU_RATIO : fontSize * EXPANDED_MENU_RATIO,
             transition: "width 0.3s",
             overflowX: "hidden",
             mt: "64px",
           },
         }}
       >
-        <Box sx={{ display: "flex", justifyContent: "center", p: 1 }} />
         <List>{renderNavItems(navigation)}</List>
       </Drawer>
-
-      {/* Popper for each nested level */}
-      {collapseMenu &&
-        Object.entries(anchorEls).map(([level, anchor]) => {
-          const item = level == hoverLevel.toString() ? hoverItem : null;
-          if (!item || !item.children) return null;
-
-          return (
-            <Popper
-              key={level}
-              open={Boolean(anchor)}
-              anchorEl={anchor}
-              placement="right-start"
-              disablePortal
-              modifiers={[
-                {
-                  name: "preventOverflow",
-                  options: { boundary: "window" },
-                },
-              ]}
-            >
-              <ClickAwayListener
-                onClickAway={(event) => {
-                  if (anchor && anchor.contains(event.target as Node)) return;
-                  handleMouseLeave();
-                }}
-              >
-                <Paper
-                  sx={{
-                    p: 1,
-                    minWidth: 200,
-                    boxShadow: 3,
-                    position: "relative",
-                    left: `${parseInt(level) * 200}px`, // Move each level further right
-                  }}
-                  onMouseEnter={() => setIsHoveringPopper(true)}
-                  onMouseLeave={() => {
-                    setIsHoveringPopper(false);
-                    handleMouseLeave();
-                  }}
-                >
-                  <List>
-                    {item.children.map((child) => (
-                      <ListItemButton
-                        key={child.title}
-                        component={Link}
-                        href={child.path || "#"}
-                        sx={{ "&:hover": { backgroundColor: "rgba(25, 118, 210, 0.1)" } }}
-                        onClick={() => {
-                          setAnchorEls({});
-                          setHoverItem(null);
-                          setHoverLevel(0);
-                        }}
-                        onMouseEnter={(e) => child.children && handleMouseEnter(e, child, parseInt(level) + 1)}
-                      >
-                        {child.icon && <ListItemIcon>{child.icon}</ListItemIcon>}
-                        <ListItemText primary={child.title} />
-                        {child.children && <ExpandMore />}
-                      </ListItemButton>
-                    ))}
-                  </List>
-                </Paper>
-              </ClickAwayListener>
-            </Popper>
-          );
-        })}
     </>
   );
 }

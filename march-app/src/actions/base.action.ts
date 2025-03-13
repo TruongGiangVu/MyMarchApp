@@ -1,3 +1,3 @@
-// base action
+'use server'
 
-export function baseKeep() { }
+export async function baseKeep() { }
