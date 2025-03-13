@@ -17,14 +17,14 @@ export default function ContextFloatingBtn() {
       {/* Floating Action Button */}
       <Fab
         color="primary"
-        sx={{ position: "fixed", bottom: 72, right: 24 }} // Adjust the position
+        sx={{ position: "fixed", bottom: 24, left: 24, zIndex: 10000 }} // Adjust the position
         onClick={() => setOpen(true)}
       >
         <SettingsIcon />
       </Fab>
 
       {/* Drawer for Theme Settings */}
-      <Drawer anchor="right" open={open} onClose={() => setOpen(false)}>
+      <Drawer anchor="left" open={open} onClose={() => setOpen(false)}>
         <Box sx={{ width: 250, padding: 2 }}>
           <h3>Thay đổi chủ đề</h3>
 
@@ -72,6 +72,7 @@ export default function ContextFloatingBtn() {
             />
           </Box>
 
+          {/* Reset To Default Selection */}
           <Box sx={{ mt: 2 }}>
             <Button
               fullWidth

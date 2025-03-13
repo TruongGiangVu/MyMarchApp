@@ -1,5 +1,5 @@
 export default function Home() {
   return (
-    <div>App page</div>
+    <h3>App page</h3>
   );
 }

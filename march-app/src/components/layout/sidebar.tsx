@@ -29,7 +29,7 @@ type NavItem = {
 };
 
 const navigation: NavItem[] = [
-  { title: "Dashboard", icon: <DashboardIcon />, path: "/" },
+  { title: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
   {
     title: "Management",
     icon: <SettingsIcon />,
@@ -38,8 +38,8 @@ const navigation: NavItem[] = [
         title: "Users",
         icon: <DashboardIcon />,
         children: [
-          { title: "Active Users", path: "/management/users/active" },
-          { title: "Banned Users", path: "/management/users/banned" },
+          { title: "Active Users", path: "/management/users/active", icon: <DashboardIcon /> },
+          { title: "Banned Users", path: "/management/users/banned", icon: <DashboardIcon /> },
         ],
       },
       {
@@ -54,6 +54,7 @@ const navigation: NavItem[] = [
           {
             title: "Yearly Reports",
             path: "/management/reports/yearly",
+            icon: <SettingsIcon />,
           },
         ],
       },
