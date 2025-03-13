@@ -1,11 +1,18 @@
 "use client";
 
-import { AppBar, Toolbar, IconButton, Typography } from "@mui/material";
+import { AppBar, Toolbar, IconButton, Typography, Button } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { useAppContext } from "@/context/app.context";
+import { User } from "next-auth";
+import { signOut } from "next-auth/react";
+import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 
-export default function Header() {
+interface IProps {
+  user?: User;
+}
+
+export default function Header({ user }: IProps) {
   const { collapseMenu, toggleMenuCollapse: toggleSidebar } = useAppContext()!;
   return (
     <AppBar position="fixed" enableColorOnDark>
@@ -16,7 +23,11 @@ export default function Header() {
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Dashboard
         </Typography>
-        <div>User name</div>
+        {user && (<>
+          <div>{user?.userName}</div>
+          <Button startIcon={<PowerSettingsNewIcon />} size="small" sx={{ marginLeft: 1 }} variant="outlined" color="inherit" onClick={() => signOut()}>Đăng xuất</Button>
+        </>)}
+
       </Toolbar>
     </AppBar>
   );

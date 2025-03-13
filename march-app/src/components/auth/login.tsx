@@ -6,8 +6,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, TextField } from "@mui/material";
 import { SubmitHandler, useForm } from "react-hook-form";
 import LoadingButton from "../buttons/loading.button";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+    const router = useRouter();
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const form = useForm<LoginReqValidator>({
         resolver: zodResolver(loginReqValidator),
@@ -23,9 +27,16 @@ export default function Login() {
 
     const onSubmitForm: SubmitHandler<LoginReqValidator> = async (data: LoginReq) => {
         // call the server action
+        setErrorMessage(null);
+
         console.log(data);
         const res = await authenticate(data.userId ?? '', data.password ?? '');
         console.log(">>> check onSubmitForm: ", res);
+        if (res.isSuccess) {
+            router.push('/dashboard');
+        } else {
+            setErrorMessage(res.message);
+        }
     };
 
     return (
@@ -51,6 +62,7 @@ export default function Login() {
                 />
 
                 <LoadingButton type="submit" variant="contained" fullWidth disabled={!isValid} loading={isSubmitting}>Đăng nhập</LoadingButton>
+                <div>{errorMessage}</div>
             </Box>
         </>
     )
