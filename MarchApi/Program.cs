@@ -14,6 +14,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // * Serilog
@@ -126,8 +128,21 @@ const string rootPath = "/";
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    app.UseSwagger(options =>
+    {
+        // options.RouteTemplate = "/openapi/{documentName}.json";
+    });
     app.UseSwaggerUI();
+    app.MapScalarApiReference(options =>{
+        options.Theme = ScalarTheme.BluePlanet;
+        options.OpenApiRoutePattern = "/swagger/v1/swagger.json";
+        options
+        .WithPreferredScheme("Bearer") // Security scheme name from the OpenAPI document
+        .WithHttpBearerAuthentication(bearer =>
+        {
+            bearer.Token = "your-bearer-token";
+        });
+    });
     // tự động chuyển qua trang swagger
     app.MapGet(rootPath, context =>
         {
