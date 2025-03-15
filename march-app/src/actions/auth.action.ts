@@ -2,7 +2,7 @@
 
 import { signIn } from "@/auth";
 import { ApiResponse } from "@/types";
-import { AuthError } from "next-auth";
+import { CustomAuthError } from "@/utils";
 
 export async function authenticate(userId: string, password: string): Promise<ApiResponse> {
     try {
@@ -18,7 +18,7 @@ export async function authenticate(userId: string, password: string): Promise<Ap
             details: [res],
         };
     } catch (error) {
-        if (error instanceof AuthError) {
+        if (error instanceof CustomAuthError) {
             return {
                 isSuccess: false,
                 code: '99',

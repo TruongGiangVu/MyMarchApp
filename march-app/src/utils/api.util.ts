@@ -51,6 +51,9 @@ function formatValue(value: PrimaryType): string {
     return value instanceof Date ? value.toISOString() : String(value);
 }
 
+/**
+ * Get token and userId of sign in user
+ */
 async function getSession(): Promise<{ token?: string; userId?: string; }> {
     const session = await auth();
     const token = session?.user?.accessToken;

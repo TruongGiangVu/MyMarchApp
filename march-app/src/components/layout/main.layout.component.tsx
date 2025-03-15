@@ -6,7 +6,6 @@ import Sidebar from "./sidebar";
 import { useAppContext } from "@/context/app.context";
 import { useSession } from "next-auth/react"
 import { HEADER_RATIO } from "@/core";
-import { useEffect, useState } from "react";
 
 export default function MainLayoutComponent({
     children,

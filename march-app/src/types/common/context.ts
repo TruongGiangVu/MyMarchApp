@@ -1,4 +1,5 @@
 export type ThemeMode = 'light' | 'dark';
+
 export type ThemeColor = "default" | "green" | "orange";
 
 export const themeColors: Record<ThemeColor, { primary: { main: string, light: string; }; secondary: { main: string } }> = {
