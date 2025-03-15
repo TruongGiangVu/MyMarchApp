@@ -1,7 +1,7 @@
 import NextAuth, { User } from "next-auth";
 import Credentials from "next-auth/providers/credentials"
 import { ApiResPayload, LoginRes } from "@/types";
-import { CustomAuthError } from "@/utils";
+import { CustomAuthError, sendApi } from "@/utils";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
@@ -12,15 +12,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 password: {},
             },
             authorize: async (credentials) => {
-                const response = await fetch(`${process.env.MARCH_API}/auth/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(credentials),
-                });
+                // const response = await fetch(`${process.env.MARCH_API}/auth/login`, {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify(credentials),
+                // });
 
-                const data: ApiResPayload<LoginRes> = await response.json();
+                // const data: ApiResPayload<LoginRes> = await response.json();
+
+                const data = await sendApi<ApiResPayload<LoginRes>>('auth/login', {
+                    method: 'POST',
+                    body: credentials,
+                    autoAddAuth: false,
+                })
 
                 if (data.isSuccess)
                     return { ...data.payload };

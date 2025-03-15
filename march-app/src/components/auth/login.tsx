@@ -8,6 +8,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import LoadingButton from "../buttons/loading.button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Routes } from "@/core";
 
 export default function Login() {
     const router = useRouter();
@@ -33,7 +34,7 @@ export default function Login() {
         const res = await authenticate(data.userId ?? '', data.password ?? '');
         console.log(">>> check onSubmitForm: ", res);
         if (res.isSuccess) {
-            router.push('/dashboard');
+            router.push(Routes.DASHBOARD);
         } else {
             setErrorMessage(res.message);
         }

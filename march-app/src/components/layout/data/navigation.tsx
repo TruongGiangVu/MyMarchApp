@@ -1,9 +1,10 @@
+import { Routes } from "@/core";
 import { NavItem } from "@/types";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SettingsIcon from "@mui/icons-material/Settings";
 
 export const navigationItems: NavItem[] = [
-  { title: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
+  { title: "Dashboard", icon: <DashboardIcon />, path: Routes.DASHBOARD },
   {
     title: "Management",
     icon: <SettingsIcon />,

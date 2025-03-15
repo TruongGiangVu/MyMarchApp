@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { Routes } from "@/core";
 import { HttpMethod, QueryParams, LogOption, NextOption, PrimaryType, ResponseType } from "@/types";
 import { redirect } from "next/navigation";
 
@@ -23,7 +24,7 @@ const defaultApiOptions: Partial<ApiOptions> = {
     autoAddAuth: true,
 };
 
-const BASE_URL = process.env.MARCH_API || "https://api.example.com"; // Set base URL
+const BASE_URL = process.env.MARCH_API || ""; // Set base URL
 
 /**
  * Encode query parameters for a URL.
@@ -112,9 +113,13 @@ export async function sendApi<T>(
 
         // if call api has error
         if (!response.ok) {
-            if (response.status === 401 || response.status === 403) {
+            if (response.status === 401) {
                 console.warn(`API returned ${response.status}, redirecting to login.`);
-                redirect("/auth/login"); // Redirect on the server side
+                redirect(Routes.SIGN_IN); // Redirect on the server side
+            }
+            if (response.status === 403) {
+                console.warn(`API returned ${response.status}, redirecting to forbidden.`);
+                redirect(Routes.FORBIDDEN); // Redirect on the server side
             }
 
             const errorBody = await response.text();
