@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { Fab, Drawer, Box, FormControl, Slider, IconButton, Stack, Button } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { ThemeColor, themeColors, useAppContext } from "@/context/app.context";
+import { useAppContext } from "@/context/app.context";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
-
+import { ThemeColor, themeColors } from "@/types";
 
 export default function ContextFloatingBtn() {
   const { themeMode, toggleTheme, themeColor, changeThemeColor, fontSize, changeFontSize, resetToDefault } = useAppContext()!;

@@ -1,15 +1,7 @@
 import { auth } from "@/auth";
+import { HttpMethod, QueryParams, LogOption, NextOption, PrimaryType, ResponseType } from "@/types";
 import { redirect } from "next/navigation";
 
-type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
-type LogOption = "input" | "output" | "both" | "none";
-type ResponseType = "json" | "blob" | "arrayBuffer";
-type NextOption = { next?: { revalidate?: number; tags?: string[] } };
-type ValueQueryParams = string | number | boolean | Date;
-type QueryParams = Record<
-    string,
-    ValueQueryParams | ValueQueryParams[] | null | undefined
->;
 
 interface ApiOptions {
     method?: HttpMethod;
@@ -55,7 +47,7 @@ function encodeQueryParams(params: QueryParams): string {
 /**
  * Convert different types to string format for URL encoding.
  */
-function formatValue(value: ValueQueryParams): string {
+function formatValue(value: PrimaryType): string {
     return value instanceof Date ? value.toISOString() : String(value);
 }
 

@@ -3,23 +3,15 @@
 import { createContext, useState, ReactNode, useContext, useEffect, useMemo } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { initializeStorage, setStorage } from "@/utils/storage.utils";
+import { initializeStorage, setStorage } from "@/utils";
 import { APP_ALIAS } from "@/core";
-
-type ThemeMode = 'light' | 'dark';
-export type ThemeColor = "default" | "green" | "orange";
+import { ThemeMode, ThemeColor, themeColors } from "@/types";
 
 type ContextStore = {
   fontSize: number;
   themeMode: ThemeMode;
   themeColor: ThemeColor;
   collapseMenu: boolean;
-};
-
-export const themeColors: Record<ThemeColor, { primary: { main: string, light: string; }; secondary: { main: string } }> = {
-  default: { primary: { main: "#1976d2", light: "#bbdefb" }, secondary: { main: "#dc004e" } }, // MUI default colors
-  green: { primary: { main: "#4CAF50", light: "#a5d6a7" }, secondary: { main: "#8BC34A" } },
-  orange: { primary: { main: "#FF9800", light: "#c8e6c9" }, secondary: { main: "#FF5722" } }
 };
 
 const KEY_APP_CONTEXT: string = `${APP_ALIAS}-context`;

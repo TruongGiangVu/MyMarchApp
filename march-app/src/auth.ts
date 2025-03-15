@@ -1,7 +1,7 @@
 import NextAuth, { User } from "next-auth";
 import Credentials from "next-auth/providers/credentials"
 import { ApiResPayload, LoginRes } from "@/types";
-import { CustomAuthError } from "@/utils/error";
+import { CustomAuthError } from "@/utils";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
@@ -49,6 +49,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             // Logged in users are authenticated, 
             //otherwise redirect to login page
             return !!auth
+            // return true
         },
     },
 })

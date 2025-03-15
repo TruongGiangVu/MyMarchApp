@@ -7,7 +7,7 @@ interface IProps extends ButtonProps {
 export default function LoadingButton({ loading, children, ...props }: IProps) {
   return (
     <Button {...props} disabled={loading || props.disabled}>
-      {loading ? <CircularProgress size="1.5em" color="inherit"/> : children}
+      {loading ? <CircularProgress size="1.5em" color="inherit" /> : children}
     </Button>
   );
 }

@@ -1,64 +1,15 @@
 "use client";
 
-import { JSX, useState } from "react";
-import {
-  Drawer,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Collapse,
-  Box,
-  Tooltip,
-} from "@mui/material";
+import { useState } from "react";
+import { Drawer, List, ListItemButton, ListItemIcon, ListItemText, Collapse, Tooltip } from "@mui/material";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import SettingsIcon from "@mui/icons-material/Settings";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAppContext } from "@/context/app.context";
-import { COLLAPSE_MENU_RATIO, EXPANDED_MENU_RATIO } from "@/core";
-
-type NavItem = {
-  title: string;
-  icon?: JSX.Element;
-  path?: string;
-  children?: NavItem[];
-};
-
-const navigation: NavItem[] = [
-  { title: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
-  {
-    title: "Management",
-    icon: <SettingsIcon />,
-    children: [
-      {
-        title: "Users",
-        icon: <DashboardIcon />,
-        children: [
-          { title: "Active Users", path: "/management/users/active", icon: <DashboardIcon /> },
-          { title: "Banned Users", path: "/management/users/banned", icon: <DashboardIcon /> },
-        ],
-      },
-      {
-        title: "Reports",
-        icon: <SettingsIcon />,
-        children: [
-          {
-            title: "Monthly Reports",
-            path: "/management/reports/monthly",
-            icon: <SettingsIcon />,
-          },
-          {
-            title: "Yearly Reports",
-            path: "/management/reports/yearly",
-            icon: <SettingsIcon />,
-          },
-        ],
-      },
-    ],
-  },
-];
+import { COLLAPSE_MENU_RATIO, EXPANDED_MENU_RATIO, HEADER_RATIO } from "@/core";
+import { NavItem } from "@/types";
+import { navigationItems } from "./data/navigation";
 
 export default function Sidebar() {
   const { collapseMenu, fontSize } = useAppContext()!;
@@ -124,11 +75,11 @@ export default function Sidebar() {
             width: collapseMenu ? fontSize * COLLAPSE_MENU_RATIO : fontSize * EXPANDED_MENU_RATIO,
             transition: "width 0.3s",
             overflowX: "hidden",
-            mt: "64px",
+            mt: `${fontSize * HEADER_RATIO}px`,
           },
         }}
       >
-        <List>{renderNavItems(navigation)}</List>
+        <List>{renderNavItems(navigationItems)}</List>
       </Drawer>
     </>
   );
